@@ -1,0 +1,56 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# پارامترها و شرایط اولیه
+N = 1000       # تعداد جمعیت کل
+I0 = 1         # تعداد افراد مبتلا اولیه
+S0 = N - I0    # تعداد افراد حساس اولیه
+E0 = 0         # تعداد افراد در دوره کمون اولیه
+R0 = 0         # تعداد افراد بهبود یافته اولیه
+beta = 0.3     # نرخ انتقال بیماری
+sigma = 0.2    # نرخ پیشرفت از دوره کمون به دوره مبتلا
+gamma = 0.1    # نرخ بهبود بیماری
+delta = 0.05   # نرخ بازگشت افراد به حالت حساس پس از بهبودی
+
+# تنظیمات شبیه‌سازی
+steps = 1000   # تعداد مراحل شبیه‌سازی
+dt = 0.1       # گام زمانی
+
+# ایجاد آرایه‌های برای ذخیره نتایج
+S = np.zeros(steps + 1)
+E = np.zeros(steps + 1)
+I = np.zeros(steps + 1)
+R = np.zeros(steps + 1)
+
+# مقادیر اولیه
+S[0] = S0
+E[0] = E0
+I[0] = I0
+R[0] = R0
+
+# اجرای شبیه‌سازی با استفاده از روش اویلر
+for t in range(steps):
+    dS = (-beta * S[t] * I[t] / N + delta * R[t]) * dt
+    dE = (beta * S[t] * I[t] / N - sigma * E[t]) * dt
+    dI = (sigma * E[t] - gamma * I[t]) * dt
+    dR = (gamma * I[t] - delta * R[t]) * dt
+
+    S[t + 1] = S[t] + dS
+    E[t + 1] = E[t] + dE
+    I[t + 1] = I[t] + dI
+    R[t + 1] = R[t] + dR
+
+# رسم نمودار نتایج
+time = np.linspace(0, steps * dt, steps + 1)
+
+plt.figure(figsize=(10, 6))
+plt.plot(time, S, label='Susceptible (S)')
+plt.plot(time, E, label='Exposed (E)')
+plt.plot(time, I, label='Infectious (I)')
+plt.plot(time, R, label='Recovered (R)')
+plt.xlabel('Time')
+plt.ylabel('Number of People')
+plt.title('SEIRS Model')
+plt.legend()
+plt.grid(True)
+plt.show()
